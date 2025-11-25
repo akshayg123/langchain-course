@@ -1,8 +1,13 @@
-from langchain_core.tools import tool
-import re
 import os
-LOG_PATH=r"C:\Users\HP\Documents\dummy_firewall.txt"
-#connect to your firewall or create a dummy log file for testing
+import re
+
+from langchain_core.tools import tool
+from tavily import TavilyClient
+
+LOG_PATH = r"C:\Users\HP\Documents\dummy_firewall.txt"
+
+
+# connect to your firewall or create a dummy log file for testing
 @tool
 def check_firewall_rules(rule: str) -> str:
     """
@@ -10,13 +15,13 @@ def check_firewall_rules(rule: str) -> str:
     Args:
         rule : The firewall rule to check for
     Returns:
-        A message indicating whether the rule exists or not 
+        A message indicating whether the rule exists or not
     """
     print(f"Checking for firewall rule: {rule}")
     if not os.path.exists(LOG_PATH):
         return "Firewall log file does not exist."
-    with open(LOG_PATH, 'r') as file:
-        log_contents=file.read()
+    with open(LOG_PATH, "r") as file:
+        log_contents = file.read()
     if re.search(re.escape(rule), log_contents):
         return f"The rule '{rule}' exists in the firewall log."
     else:
@@ -24,7 +29,7 @@ def check_firewall_rules(rule: str) -> str:
 
 
 @tool
-def get_firewall_rows(rule: str) ->str:
+def get_firewall_rows(rule: str) -> str:
     """
     Tool that retrieves all log entries related to a specific firewall rule.
     Args:
@@ -35,9 +40,23 @@ def get_firewall_rows(rule: str) ->str:
     print(f"retrieving log entries for firewall rule: {rule}")
     if not os.path.exists(LOG_PATH):
         return "Firewall log file does not exist."
-    with open(LOG_PATH, 'r') as file:
-        lines=file.readlines()
-    matches=[i.strip() for i in lines if re.search(re.escape(rule), i,re.IGNORECASE)]
+    with open(LOG_PATH, "r") as file:
+        lines = file.readlines()
+    matches = [i.strip() for i in lines if re.search(re.escape(rule), i, re.IGNORECASE)]
     if not matches:
         return f"No log entries found for the rule '{rule}'."
     return "\n".join(matches)
+
+
+@tool
+def search_internet(query: str) -> str:
+    """
+    Tool that searches over the internet
+    Args:
+        query : The query to search for
+    Returns:
+        The search results
+    """
+    tavily = TavilyClient()
+    print(f"Searching for: {query}")
+    return tavily.search(query=query)
