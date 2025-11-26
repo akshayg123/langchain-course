@@ -29,16 +29,32 @@ agent=create_react_agent(
     tools=tools,
     prompt=react_prompt
 )
+# AgentExecutor is used to create an executor that runs the agent with the provided tools
 agent_executor=AgentExecutor(
     agent=agent,
     tools=tools,
     verbose=True,
     handle_parsing_errors=True
 )
-# AgentExecutor is used to create an executor that runs the agent with the provided tools
+
+#extract_output returns x['output'] from the final result
+extract_output=RunnableLambda(
+    lambda x: x['output']
+)
+
+#parse_output takes x['output'] and returns it in a structured format using output_parser
+parse_output=RunnableLambda(
+    lambda x: output_parser.parse(x)
+)
+
+#here output of previous one is next one's input and so on(chaining)
+chain=agent_executor | extract_output | parse_output
+
+
+
 
 def main():
-    result=agent_executor.invoke(
+    result=chain.invoke(
         input={
             "input":"Search 3 job openings for cloud security architects in india and provide the URLs of the sources used",
         }
