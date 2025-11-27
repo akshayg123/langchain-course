@@ -13,6 +13,8 @@ dependencies = [
     "langchain-tavily>=0.2.13",
     "langsmith>=0.4.44",
     "mcp>=1.22.0",
+    "pandas>=2.3.3",
     "python-dotenv>=1.2.1",
+    "splunk-sdk>=2.1.1",
     "tavily-python>=0.7.13",
 ]
